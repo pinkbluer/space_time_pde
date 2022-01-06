@@ -202,7 +202,7 @@ def get_args():
 
     # Training settings
     parser = argparse.ArgumentParser(description="Segmentation")
-    parser.add_argument("--batch_size_per_gpu", type=int, default=10, metavar="N",
+    parser.add_argument("--batch_size_per_gpu", type=int, default=5, metavar="N",
                         help="input batch size for training (default: 10)")
     parser.add_argument("--epochs", type=int, default=10, metavar="N",
                         help="number of epochs to train (default: 100)")
@@ -233,7 +233,7 @@ def get_args():
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
-    parser.add_argument("--n_samp_pts_per_crop", default=512, type=int,
+    parser.add_argument("--n_samp_pts_per_crop", default=128, type=int,
                         help="number of sample points to draw per crop.")
     parser.add_argument("--lat_dims", default=32, type=int, help="number of latent dimensions.")
     parser.add_argument("--unet_nf", default=16, type=int,
