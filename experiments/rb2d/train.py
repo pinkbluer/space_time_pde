@@ -233,7 +233,7 @@ def get_args():
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
-    parser.add_argument("--n_samp_pts_per_crop", default=256, type=int,
+    parser.add_argument("--n_samp_pts_per_crop", default=128, type=int,
                         help="number of sample points to draw per crop.")
     parser.add_argument("--lat_dims", default=32, type=int, help="number of latent dimensions.")
     parser.add_argument("--unet_nf", default=16, type=int,
