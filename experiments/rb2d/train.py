@@ -28,6 +28,12 @@ from physics import get_rb2_pde_layer
 
 # pylint: disable=no-member
 
+# Rayleigh and Prandtl numbers - set according to your dataset
+rayleigh=1000000
+prandtl=1
+gamma=0.0125
+use_continuity=True
+log_dir_name="./log/Exp1"
 
 def loss_functional(loss_type):
     """Get loss function given function type names."""
@@ -198,7 +204,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Segmentation")
     parser.add_argument("--batch_size_per_gpu", type=int, default=10, metavar="N",
                         help="input batch size for training (default: 10)")
-    parser.add_argument("--epochs", type=int, default=100, metavar="N",
+    parser.add_argument("--epochs", type=int, default=10, metavar="N",
                         help="number of epochs to train (default: 100)")
     parser.add_argument("--pseudo_epoch_size", type=int, default=3000, metavar="N",
                         help="number of samples in an pseudo-epoch. (default: 3000)")
@@ -206,7 +212,7 @@ def get_args():
                         help="learning rate (default: 0.01)")
     parser.add_argument("--no_cuda", action="store_true", default=False,
                         help="disables CUDA training")
-    parser.add_argument("--seed", type=int, default=1, metavar="S",
+    parser.add_argument("--seed", type=int, default=42, metavar="S",
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
@@ -216,7 +222,7 @@ def get_args():
                         help="name of training data (default: rb2d_ra1e6_s42.npz)")
     parser.add_argument("--log_interval", type=int, default=10, metavar="N",
                         help="how many batches to wait before logging training status")
-    parser.add_argument("--log_dir", type=str, required=True, help="log directory for run")
+    parser.add_argument("--log_dir", type=str,  default=log_dir_name, help="log directory for run")
     parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd"])
     parser.add_argument("--resume", type=str, default=None,
                         help="path to checkpoint if resume is needed")
@@ -227,7 +233,7 @@ def get_args():
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
-    parser.add_argument("--n_samp_pts_per_crop", default=1024, type=int,
+    parser.add_argument("--n_samp_pts_per_crop", default=512, type=int,
                         help="number of sample points to draw per crop.")
     parser.add_argument("--lat_dims", default=32, type=int, help="number of latent dimensions.")
     parser.add_argument("--unet_nf", default=16, type=int,
@@ -240,7 +246,7 @@ def get_args():
                         choices=["l1", "l2", "huber"],
                         help="number of base number of feature layers in implicit network.")
     parser.add_argument("--alpha_reg", default=1., type=float, help="weight of regression loss.")
-    parser.add_argument("--alpha_pde", default=1., type=float, help="weight of pde residue loss.")
+    parser.add_argument("--alpha_pde", default=gamma, type=float, help="weight of pde residue loss.")
     parser.add_argument("--num_log_images", default=2, type=int, help="number of images to log.")
     parser.add_argument("--pseudo_batch_size", default=1024, type=int,
                         help="size of pseudo batch during eval.")
@@ -258,13 +264,13 @@ def get_args():
     parser.add_argument("--lres_interp", default='linear', type=str,
                         help=("type of interpolation scheme for generating low res input data."
                               "choice of 'linear', 'nearest'"))
-    parser.add_argument('--rayleigh', type=float, required=True,
+    parser.add_argument('--rayleigh', type=float, default=rayleigh,
                         help='Simulation Rayleigh number.')
-    parser.add_argument('--prandtl', type=float, required=True,
+    parser.add_argument('--prandtl', type=float, default=prandtl,
                         help='Simulation Prandtl number.')
-    parser.add_argument('--nonlin', type=str, default='leakyrelu', choices=list(NONLINEARITIES.keys()),
+    parser.add_argument('--nonlin', type=str, default='softplus', choices=list(NONLINEARITIES.keys()),
                         help='Nonlinear activations for continuous decoder.')
-    parser.add_argument('--use_continuity', type=str2bool, nargs='?', default=False, const=True,
+    parser.add_argument('--use_continuity', type=str2bool, nargs='?', default=use_continuity, const=True,
                         help='Whether to enforce continuity equation (mass conservation) or not')
 
     args = parser.parse_args()
