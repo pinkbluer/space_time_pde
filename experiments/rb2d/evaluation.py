@@ -99,7 +99,7 @@ def frames_to_video(frames_pattern, save_video_to, frame_rate=10, keep_frames=Fa
 def calculate_flow_stats(pred, hres, args, visc=0.0001):
     data = pred
     uw = np.transpose(data[2:4,:,:,1:1+args.eval_zres], (1, 0, 2, 3))
-    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     uw = torch.tensor(uw, device=device).float()
     stats = compute_all_stats(uw[2:,:,:,:], viscosity=visc, description=False)
     s = [stats[..., i].item() for i in range(stats.shape[0])]
@@ -119,7 +119,7 @@ def calculate_flow_stats(pred, hres, args, visc=0.0001):
 
     data = hres
     uw = np.transpose(data[2:4,:,:,1:1+args.eval_zres], (1, 0, 2, 3))
-    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     uw = torch.tensor(uw, device=device).float()
     stats = compute_all_stats(uw[2:,:,:,:], viscosity=visc, description=False)
     s = [stats[..., i].item() for i in range(stats.shape[0])]
