@@ -14,7 +14,7 @@ class RB2DataLoader(Dataset):
 
     Loads a 2d space + time cubic cutout from the whole simulation.
     """
-    def __init__(self, data_dir="./", data_filename="./data/rb2d_ra1e6_s42.npz",
+    def __init__(self, data_dir="./data", data_filename="rb2d_ra1e6_s42.npz",
                  nx=128, nz=128, nt=16, n_samp_pts_per_crop=1024,
                  downsamp_xz=4, downsamp_t=4, normalize_output=False, normalize_hres=False,
                  return_hres=False, lres_filter='none', lres_interp='linear'):
@@ -22,8 +22,8 @@ class RB2DataLoader(Dataset):
 
         Initialize DataSet
         Args:
-          data_dir: str, path to the dataset folder, default="./"
-          data_filename: str, name of the dataset file, default="rb2d_ra1e6_s42"
+          data_dir: str, path to the dataset folder, default="./data"
+          data_filename: str, name of the dataset file, default="rb2d_ra1e6_s42.npz"
           nx: int, number of 'pixels' in x dimension for high res dataset.
           nz: int, number of 'pixels' in z dimension for high res dataset.
           nt: int, number of timesteps in time for high res dataset.
