@@ -274,7 +274,7 @@ def get_args():
                         help="frame rate for output video (default: 10)")
     parser.add_argument("--keep_frames", dest='keep_frames', action='store_true')
     parser.add_argument("--no_keep_frames", dest='keep_frames', action='store_false')
-    parser.add_argument("--eval_pseudo_batch_size", type=int, default=2000,
+    parser.add_argument("--eval_pseudo_batch_size", type=int, default=5000,
                         help="psudo batch size for querying the grid. set to a smaller"
                              " value if OOM error occurs")
     parser.add_argument('--rayleigh', type=float, default=1000000,
