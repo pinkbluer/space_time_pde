@@ -260,9 +260,9 @@ def get_args():
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--eval_downsamp_xz", default=4, type=int, required=True,
                         help="down sampling factor in x and z for low resolution crop.")
-    parser.add_argument('--ckpt', type=str, required=True, help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='eval')
-    parser.add_argument("--eval_dataset", type=str, required=True)
+    parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
+    parser.add_argument("--save_path", type=str, default='./eval/Exp3')
+    parser.add_argument("--eval_dataset", type=str, default='./data/rb2d_ra1e6_s42.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
@@ -275,9 +275,9 @@ def get_args():
     parser.add_argument("--eval_pseudo_batch_size", type=int, default=10000,
                         help="psudo batch size for querying the grid. set to a smaller"
                              " value if OOM error occurs")
-    parser.add_argument('--rayleigh', type=float, required=True,
+    parser.add_argument('--rayleigh', type=float, default=1000000,
                         help='Simulation Rayleigh number.')
-    parser.add_argument('--prandtl', type=float, required=True,
+    parser.add_argument('--prandtl', type=float, default=1,
                         help='Simulation Prandtl number.')
     parser.set_defaults(keep_frames=False)
     args = parser.parse_args()
