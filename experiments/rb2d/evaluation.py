@@ -96,7 +96,7 @@ def frames_to_video(frames_pattern, save_video_to, frame_rate=10, keep_frames=Fa
         shutil.rmtree(frames_dir)
 
 
-def calculate_flow_stats(pred, hres, visc=0.0001):
+def calculate_flow_stats(pred, hres, args, visc=0.0001):
     data = pred
     uw = np.transpose(data[2:4,:,:,1:1+args.eval_zres], (1, 0, 2, 3))
     device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
@@ -145,7 +145,7 @@ def export_video(args, res_dict, hres, lres, dataset):
         lres = dataset.denormalize_grid(lres.copy())
         pred = np.stack([res_dict[key] for key in phys_channels], axis=0)
         pred = dataset.denormalize_grid(pred)
-        calculate_flow_stats(pred, hres)       # Warning: only works with pytorch > v1.3 and CUDA >= v10.1
+        calculate_flow_stats(pred, hres, args)       # Warning: only works with pytorch > v1.3 and CUDA >= v10.1
         # np.savez_compressed(args.save_path+'highres_lowres_pred', hres=lres, lres=lres, pred=pred)
 
     os.makedirs(args.save_path, exist_ok=True)
@@ -274,7 +274,7 @@ def get_args():
                         help="frame rate for output video (default: 10)")
     parser.add_argument("--keep_frames", dest='keep_frames', action='store_true')
     parser.add_argument("--no_keep_frames", dest='keep_frames', action='store_false')
-    parser.add_argument("--eval_pseudo_batch_size", type=int, default=1000,
+    parser.add_argument("--eval_pseudo_batch_size", type=int, default=2000,
                         help="psudo batch size for querying the grid. set to a smaller"
                              " value if OOM error occurs")
     parser.add_argument('--rayleigh', type=float, default=1000000,
