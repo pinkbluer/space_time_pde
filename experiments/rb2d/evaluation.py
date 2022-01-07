@@ -97,7 +97,7 @@ def frames_to_video(frames_pattern, save_video_to, frame_rate=10, keep_frames=Fa
 def calculate_flow_stats(pred, hres, visc=0.0001):
     data = pred
     uw = np.transpose(data[2:4,:,:,1:1+args.eval_zres], (1, 0, 2, 3))
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     uw = torch.tensor(uw, device=device).float()
     stats = compute_all_stats(uw[2:,:,:,:], viscosity=visc, description=False)
     s = [stats[..., i].item() for i in range(stats.shape[0])]
@@ -117,7 +117,7 @@ def calculate_flow_stats(pred, hres, visc=0.0001):
 
     data = hres
     uw = np.transpose(data[2:4,:,:,1:1+args.eval_zres], (1, 0, 2, 3))
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     uw = torch.tensor(uw, device=device).float()
     stats = compute_all_stats(uw[2:,:,:,:], viscosity=visc, description=False)
     s = [stats[..., i].item() for i in range(stats.shape[0])]
@@ -256,9 +256,9 @@ def get_args():
                         help="z resolution during evaluation (default: 128)")
     parser.add_argument("--eval_tres", type=int, default=192, metavar="T",
                         help="t resolution during evaluation (default: 192)")
-    parser.add_argument("--eval_downsamp_t", default=4, type=int, required=True, 
+    parser.add_argument("--eval_downsamp_t", default=4, type=int, 
                         help="down sampling factor in t for low resolution crop.")
-    parser.add_argument("--eval_downsamp_xz", default=4, type=int, required=True,
+    parser.add_argument("--eval_downsamp_xz", default=4, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
     parser.add_argument("--save_path", type=str, default='./eval/Exp3')
