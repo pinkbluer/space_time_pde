@@ -33,7 +33,7 @@ rayleigh=1000000
 prandtl=1
 gamma=0.0125
 use_continuity=True
-log_dir_name="./log/Exp2"
+log_dir_name="./log/Exp3"
 
 def loss_functional(loss_type):
     """Get loss function given function type names."""
