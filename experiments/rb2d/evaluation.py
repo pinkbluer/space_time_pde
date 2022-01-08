@@ -23,7 +23,7 @@ import dataloader_spacetime as loader
 from physics import get_rb2_pde_layer
 from torch_flow_stats import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 def evaluate_feat_grid(pde_layer, latent_grid, t_seq, z_seq, x_seq, mins, maxs, pseudo_batch_size):
     """Evaluate latent feature grid at fixed intervals.
