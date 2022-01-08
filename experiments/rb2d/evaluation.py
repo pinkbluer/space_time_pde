@@ -263,10 +263,10 @@ def get_args():
     parser.add_argument("--eval_downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/Exp3/rb2d_ra1e3_s132')
+    parser.add_argument("--save_path", type=str, default='./eval/Exp3/rb2d_ra1e6_s102')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--eval_dataset", type=str, default='rb2d_ra1e3_s132.npz')
+    parser.add_argument("--eval_dataset", type=str, default='rb2d_ra1e6_s102.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
@@ -296,7 +296,6 @@ def main():
     with open(param_file, 'r') as fh:
         args.__dict__.update(json.load(fh))
 
-    args.rayleigh = 1000.0
     print(args)
     # prepare dataset
     dataset = loader.RB2DataLoader(
