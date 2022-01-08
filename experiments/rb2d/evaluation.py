@@ -279,23 +279,24 @@ def get_args():
     parser.add_argument("--eval_pseudo_batch_size", type=int, default=5000,
                         help="psudo batch size for querying the grid. set to a smaller"
                              " value if OOM error occurs")
-    parser.add_argument('--rayleigh', type=float, default=1000,
+    parser.add_argument('--rayleigh', type=float, default=1000.0,
                         help='Simulation Rayleigh number.')
-    parser.add_argument('--prandtl', type=float, default=1,
+    parser.add_argument('--prandtl', type=float, default=1.0,
                         help='Simulation Prandtl number.')
-    parser.add_argument("--normalize_channels", dest='normalize_channels', action='store_true')
-    parser.add_argument("--no_normalize_channels", dest='normalize_channels', action='store_false')
-    parser.set_defaults(normalize_channels=True)
+    # parser.add_argument("--normalize_channels", dest='normalize_channels', action='store_true')
+    # parser.add_argument("--no_normalize_channels", dest='normalize_channels', action='store_false')
+    # parser.set_defaults(normalize_channels=True)
     args = parser.parse_args()
     return args
 
 
 def main():
     args = get_args()
-    # param_file = os.path.join(os.path.dirname(args.ckpt), "params.json")
-    # with open(param_file, 'r') as fh:
-    #     args.__dict__.update(json.load(fh))
+    param_file = os.path.join(os.path.dirname(args.ckpt), "params.json")
+    with open(param_file, 'r') as fh:
+        args.__dict__.update(json.load(fh))
 
+    args.rayleigh = 1000.0
     print(args)
     # prepare dataset
     dataset = loader.RB2DataLoader(
