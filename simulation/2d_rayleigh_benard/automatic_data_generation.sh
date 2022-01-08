@@ -1,5 +1,5 @@
 #!/bin/bash
-for VARIABLE in $(seq 52 10 132)
+for VARIABLE in $(seq 42 10 132)
 do
     conda activate dedalus
     mpiexec -n 1 python rayleigh_benard.py --seed $VARIABLE
