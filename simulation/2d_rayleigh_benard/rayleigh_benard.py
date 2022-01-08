@@ -57,7 +57,7 @@ def get_args():
                         help='Simulation step size in time. (default: 0.125)')
     parser.add_argument('--stop_sim_time', default=50., type=float,
                         help='Simulation stop time. (default: 50)')
-    parser.add_argument('--rayleigh', default=1e6, type=float,
+    parser.add_argument('--rayleigh', default=1e3, type=float,
                         help='Simulation Rayleigh number. (default: 1e6)')
     parser.add_argument('--prandtl', default=1., type=float,
                         help='Simulation Prandtl number. (default: 1.0)')
