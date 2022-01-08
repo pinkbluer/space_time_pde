@@ -288,9 +288,9 @@ def get_args():
 
 def main():
     args = get_args()
-    param_file = os.path.join(os.path.dirname(args.ckpt), "params.json")
-    with open(param_file, 'r') as fh:
-        args.__dict__.update(json.load(fh))
+    # param_file = os.path.join(os.path.dirname(args.ckpt), "params.json")
+    # with open(param_file, 'r') as fh:
+    #     args.__dict__.update(json.load(fh))
 
     print(args)
     # prepare dataset
