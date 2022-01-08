@@ -264,6 +264,8 @@ def get_args():
                         help="down sampling factor in x and z for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
     parser.add_argument("--save_path", type=str, default='./eval/Exp3/rb2d_ra1e3_s132')
+    parser.add_argument("--data_folder", type=str, default="./data",
+                        help="path to data folder (default: ./data)")
     parser.add_argument("--eval_dataset", type=str, default='rb2d_ra1e3_s132.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
@@ -281,7 +283,9 @@ def get_args():
                         help='Simulation Rayleigh number.')
     parser.add_argument('--prandtl', type=float, default=1,
                         help='Simulation Prandtl number.')
-    parser.set_defaults(keep_frames=False)
+    parser.add_argument("--normalize_channels", dest='normalize_channels', action='store_true')
+    parser.add_argument("--no_normalize_channels", dest='normalize_channels', action='store_false')
+    parser.set_defaults(normalize_channels=True)
     args = parser.parse_args()
     return args
 
