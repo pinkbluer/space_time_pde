@@ -36,7 +36,7 @@ use_continuity=True
 log_dir_name="./log/Exp4"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 def loss_functional(loss_type):
     """Get loss function given function type names."""
@@ -215,7 +215,7 @@ def get_args():
                         help="learning rate (default: 0.01)")
     parser.add_argument("--no_cuda", action="store_true", default=False,
                         help="disables CUDA training")
-    parser.add_argument("--seed", type=int, default=42, metavar="S",
+    parser.add_argument("--seed", type=int, default=1, metavar="S",
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
@@ -229,10 +229,10 @@ def get_args():
     parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd"])
     parser.add_argument("--resume", type=str, default=None,
                         help="path to checkpoint if resume is needed")
-    parser.add_argument("--nt", default=16, type=int, help="resolution of high res crop in t.")
+    parser.add_argument("--nt", default=40, type=int, help="resolution of high res crop in t.")
     parser.add_argument("--nx", default=128, type=int, help="resolution of high res crop in x.")
     parser.add_argument("--nz", default=128, type=int, help="resolution of high res crop in z.")
-    parser.add_argument("--downsamp_t", default=4, type=int,
+    parser.add_argument("--downsamp_t", default=10, type=int,
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
@@ -290,6 +290,7 @@ def main():
     args.batch_size = int(torch.cuda.device_count()) * args.batch_size_per_gpu
     print("GPU Number: %d\n", int(torch.cuda.device_count()))
     print("Total batch size: %d\n", args.batch_size)
+    print(args)
 
     # log and create snapshots
     os.makedirs(args.log_dir, exist_ok=True)
