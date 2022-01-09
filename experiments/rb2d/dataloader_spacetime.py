@@ -73,6 +73,7 @@ class RB2DataLoader(Dataset):
                              'must not exceed dataset limits x ({}) z ({}) t ({})'.format(
                                  nx, nz, nt, nx_data, nz_data, nt_data))
         if (nt % downsamp_t != 0) or (nx % downsamp_xz != 0) or (nz % downsamp_xz != 0):
+            print('nt:%d, downsamp_t:%d, nx:%d, nz:%d, downsamp_xz:%d\n' % (nt,downsamp_t,nx, nz, downsamp_xz))
             raise ValueError('nx, nz and nt must be divisible by downsamp factor.')
 
         self.nx_start_range = np.arange(0, nx_data-nx+1)

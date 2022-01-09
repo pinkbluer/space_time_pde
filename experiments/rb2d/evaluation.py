@@ -256,14 +256,14 @@ def get_args():
                         help="x resolution during evaluation (default: 512)")
     parser.add_argument("--eval_zres", type=int, default=128, metavar="Z",
                         help="z resolution during evaluation (default: 128)")
-    parser.add_argument("--eval_tres", type=int, default=192, metavar="T",
+    parser.add_argument("--eval_tres", type=int, default=200, metavar="T",
                         help="t resolution during evaluation (default: 192)")
-    parser.add_argument("--eval_downsamp_t", default=4, type=int, 
+    parser.add_argument("--eval_downsamp_t", default=10, type=int, 
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--eval_downsamp_xz", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
-    parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/Exp3/rb2d_ra1e6_s102')
+    parser.add_argument('--ckpt', type=str, default='./log/Exp4/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
+    parser.add_argument("--save_path", type=str, default='./eval/Exp4/rb2d_ra1e6_s102')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
     parser.add_argument("--eval_dataset", type=str, default='rb2d_ra1e6_s102.npz')
@@ -279,7 +279,7 @@ def get_args():
     parser.add_argument("--eval_pseudo_batch_size", type=int, default=5000,
                         help="psudo batch size for querying the grid. set to a smaller"
                              " value if OOM error occurs")
-    parser.add_argument('--rayleigh', type=float, default=1000.0,
+    parser.add_argument('--rayleigh', type=float, default=1000000.0,
                         help='Simulation Rayleigh number.')
     parser.add_argument('--prandtl', type=float, default=1.0,
                         help='Simulation Prandtl number.')
