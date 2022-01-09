@@ -215,14 +215,14 @@ def get_args():
                         help="learning rate (default: 0.01)")
     parser.add_argument("--no_cuda", action="store_true", default=False,
                         help="disables CUDA training")
-    parser.add_argument("--seed", type=int, default=42, metavar="S",
+    parser.add_argument("--seed", type=int, default=1, metavar="S",
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--train_data", type=str, default="rb2d_ra1e6_s42.npz",
-                        help="name of training data (default: rb2d_ra1e6_s42.npz)")
-    parser.add_argument("--eval_data", type=str, default="rb2d_ra1e6_s42.npz",
-                        help="name of training data (default: rb2d_ra1e6_s42.npz)")
+    parser.add_argument("--train_data", type=str, default="swe.npz",
+                        help="name of training data (default: swe.npz)")
+    parser.add_argument("--eval_data", type=str, default="swe.npz",
+                        help="name of training data (default: swe.npz)")
     parser.add_argument("--log_interval", type=int, default=10, metavar="N",
                         help="how many batches to wait before logging training status")
     parser.add_argument("--log_dir", type=str,  default=log_dir_name, help="log directory for run")
@@ -288,8 +288,6 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
     # adjust batch size based on the number of gpus available
     args.batch_size = int(torch.cuda.device_count()) * args.batch_size_per_gpu
-    print("GPU Number: %d\n", int(torch.cuda.device_count()))
-    print("Total batch size: %d\n", args.batch_size)
 
     # log and create snapshots
     os.makedirs(args.log_dir, exist_ok=True)
