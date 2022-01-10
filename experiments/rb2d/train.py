@@ -92,13 +92,13 @@ def train(args, unet, imnet, train_loader, epoch, global_step, device,
         optimizer.step()
         tot_loss += loss.item()
         count += input_grid.size()[0]
-        if batch_idx % args.log_interval == 0:
+        if (batch_idx+1) % args.log_interval == 0:
             # logger log
             logger.info(
                 "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss Sum: {:.6f}\t"
                 "Loss Reg: {:.6f}\tLoss Pde: {:.6f}".format(
-                    epoch, batch_idx * len(input_grid), len(train_loader) * len(input_grid),
-                    100. * batch_idx / len(train_loader), loss.item(),
+                    epoch, (batch_idx+1) * len(input_grid), len(train_loader) * len(input_grid),
+                    100. * (batch_idx+1) / len(train_loader), loss.item(),
                     args.alpha_reg * reg_loss, args.alpha_pde * pde_loss))
             # tensorboard log
             writer.add_scalar('train/reg_loss_unweighted', reg_loss, global_step=int(global_step))
