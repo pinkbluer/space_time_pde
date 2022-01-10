@@ -36,7 +36,7 @@ use_continuity=True
 log_dir_name="./log/Exp1"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1,3,4,5,6,7'
 
 def loss_functional(loss_type):
     """Get loss function given function type names."""

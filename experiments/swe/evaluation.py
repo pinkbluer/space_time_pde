@@ -23,7 +23,7 @@ import dataloader_spacetime as loader
 from physics import get_swe_pde_layer
 from torch_flow_stats import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1,3,4,5,6,7'
 
 def evaluate_feat_grid(pde_layer, latent_grid, t_seq, y_seq, x_seq, mins, maxs, pseudo_batch_size):
     """Evaluate latent feature grid at fixed intervals.
@@ -262,8 +262,8 @@ def get_args():
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--eval_downsamp_xy", default=8, type=int,
                         help="down sampling factor in x and y for low resolution crop.")
-    parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/Exp1/swe')
+    parser.add_argument('--ckpt', type=str, default='./log/Exp1/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
+    parser.add_argument("--save_path", type=str, default='./eval/Exp1/eval1')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
     parser.add_argument("--eval_dataset", type=str, default='swe.npz')
