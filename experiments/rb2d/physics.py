@@ -7,8 +7,7 @@ def get_rb2_pde_layer(mean=None, std=None, t_crop=2., z_crop=1., x_crop=2., pran
     """Get PDE layer corresponding to the RB2 govening equations.
 
     Args:
-        mean: array of length 4 corresponding to the mean of the 4 physical channels, for normalizng
-        the equations. does not normalize if set to None (default).
+        mean: array of length 4 corresponding to the mean of the 4 physical channels, for normalizng the equations. does not normalize if set to None (default).
         std: array of length 4 corresponding to the std of the 4 physical channels, for normalizing
         the equations. does not normalize if set to None (default).
         t_crop: float, physical temporal span of crop.
@@ -64,11 +63,10 @@ def get_rb2_pde_layer(mean=None, std=None, t_crop=2., z_crop=1., x_crop=2., pran
     return pde_layer  # NOTE: forward method has not yet been updated.
 
 def get_swe_pde_layer(mean=None, std=None, t_crop=2., y_crop=1., x_crop=2., prandtl=1., rayleigh=1e6, use_continuity=False):
-    """Get PDE layer corresponding to the RB2 govening equations.
+    """Get PDE layer corresponding to the SWE govening equations.
 
     Args:
-        mean: array of length 3 corresponding to the mean of the 3 physical channels, for normalizng
-        the equations. does not normalize if set to None (default).
+        mean: array of length 3 corresponding to the mean of the 3 physical channels, for normalizng the equations. does not normalize if set to None (default).
         std: array of length 3 corresponding to the std of the 3 physical channels, for normalizing
         the equations. does not normalize if set to None (default).
         t_crop: float, physical temporal span of crop.
@@ -78,14 +76,16 @@ def get_swe_pde_layer(mean=None, std=None, t_crop=2., y_crop=1., x_crop=2., pran
     # constants
     g = 9.81
     H = 100
+    beta = 2E-11
+    f_0 = 1E-4 
     # set up variables and equations
     in_vars = 't, x, y'
     out_vars = 'eta, u, v'
     nt, ny, nx = 1./t_crop, 1./y_crop, 1./x_crop
     eqn_strs = [ 
         f'{nt}*dif(eta,t)+{nx}*u*dif(eta,x)+{nx}*(eta+{H})*dif(u,x)+{ny}*v*dif(eta,y)+{ny}*(eta+{H})*dif(v,y)',
-        f'{nt}*dif(u,t)-f*v+{g}*{nx}*dif(eta,x)',
-        f'{nt}*dif(v,t)-f*u+{g}*{ny}*dif(eta,y)',
+        f'{nt}*dif(u,t)-({f_0}+{beta}*y)*v+{g}*{nx}*dif(eta,x)',
+        f'{nt}*dif(v,t)-({f_0}+{beta}*y)*u+{g}*{ny}*dif(eta,y)',
     ]
     # a name/identifier for the equations
     eqn_names = ['transport_eqn_eta', 'transport_eqn_u', 'transport_eqn_v']
