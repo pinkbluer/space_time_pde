@@ -93,6 +93,8 @@ def train(args, unet, imnet, train_loader, epoch, global_step, device,
         tot_loss += loss.item()
         count += input_grid.size()[0]
         if (batch_idx+1) % args.log_interval == 0:
+            print('shape of pred_value per batch: '+pred_value.shape()+'\n')
+            print('shape of pde_tensors per batch: '+pde_tensors.shape()+'\n')
             # logger log
             logger.info(
                 "Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss Sum: {:.6f}\t"

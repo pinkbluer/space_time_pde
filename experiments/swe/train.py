@@ -24,7 +24,7 @@ from implicit_net import ImNet
 from local_implicit_grid import query_local_implicit_grid
 from nonlinearities import NONLINEARITIES
 import dataloader_spacetime as loader
-from physics import get_rb2_pde_layer
+from physics import get_swe_pde_layer
 
 # pylint: disable=no-member
 
@@ -33,7 +33,7 @@ rayleigh=1000000
 prandtl=1
 gamma=0.0125
 use_continuity=True
-log_dir_name="./log/Exp4"
+log_dir_name="./log/Exp1"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['CUDA_VISIBLE_DEVICES'] = '2'
@@ -377,7 +377,7 @@ def main():
         std = trainset.channel_std
     else:
         mean = std = None
-    pde_layer = get_rb2_pde_layer(mean=mean, std=std,
+    pde_layer = get_swe_pde_layer(mean=mean, std=std,
         t_crop=args.nt*0.125, z_crop=args.nz*(1./128), x_crop=args.nx*(1./128), prandtl=args.prandtl, rayleigh=args.rayleigh,
         use_continuity=args.use_continuity)
 
