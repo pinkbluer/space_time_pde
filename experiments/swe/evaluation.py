@@ -263,10 +263,10 @@ def get_args():
     parser.add_argument("--eval_downsamp_xy", default=8, type=int,
                         help="down sampling factor in x and y for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp1/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/Exp1/eval1')
+    parser.add_argument("--save_path", type=str, default='./eval/Exp1/eval2')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--eval_dataset", type=str, default='swe_exp1.npz')
+    parser.add_argument("--eval_dataset", type=str, default='swe_exp1_eval2.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
