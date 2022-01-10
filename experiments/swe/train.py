@@ -32,8 +32,8 @@ from physics import get_swe_pde_layer
 rayleigh=1000000
 prandtl=1
 # gamma=0.0125
-gamma=1
-use_continuity=True
+gamma=0.125
+use_continuity=False
 log_dir_name="./log/Exp1_2"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
