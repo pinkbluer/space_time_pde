@@ -139,13 +139,13 @@ def calculate_flow_stats(pred, hres, args, visc=0.0001):
 def export_video(args, res_dict, hres, lres, dataset):
     """Export inference result as a video.
     """
-    phys_channels = ["p", "b", "u", "w"]
+    phys_channels = ["eta", "u", "v"]
     if dataset:
         # hres = dataset.denormalize_grid(hres.copy())
         lres = dataset.denormalize_grid(lres.copy())
         pred = np.stack([res_dict[key] for key in phys_channels], axis=0)
         pred = dataset.denormalize_grid(pred)
-        calculate_flow_stats(pred, hres, args)       # Warning: only works with pytorch > v1.3 and CUDA >= v10.1
+        # calculate_flow_stats(pred, hres, args)       # Warning: only works with pytorch > v1.3 and CUDA >= v10.1
         # np.savez_compressed(args.save_path+'highres_lowres_pred', hres=lres, lres=lres, pred=pred)
 
     os.makedirs(args.save_path, exist_ok=True)
