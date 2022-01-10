@@ -7,8 +7,7 @@ def get_rb2_pde_layer(mean=None, std=None, t_crop=2., z_crop=1., x_crop=2., pran
     """Get PDE layer corresponding to the RB2 govening equations.
 
     Args:
-        mean: array of length 4 corresponding to the mean of the 4 physical channels, for normalizng
-        the equations. does not normalize if set to None (default).
+        mean: array of length 4 corresponding to the mean of the 4 physical channels, for normalizng the equations. does not normalize if set to None (default).
         std: array of length 4 corresponding to the std of the 4 physical channels, for normalizing
         the equations. does not normalize if set to None (default).
         t_crop: float, physical temporal span of crop.
@@ -67,8 +66,7 @@ def get_swe_pde_layer(mean=None, std=None, t_crop=2., y_crop=1., x_crop=2., pran
     """Get PDE layer corresponding to the SWE govening equations.
 
     Args:
-        mean: array of length 3 corresponding to the mean of the 3 physical channels, for normalizng
-        the equations. does not normalize if set to None (default).
+        mean: array of length 3 corresponding to the mean of the 3 physical channels, for normalizng the equations. does not normalize if set to None (default).
         std: array of length 3 corresponding to the std of the 3 physical channels, for normalizing
         the equations. does not normalize if set to None (default).
         t_crop: float, physical temporal span of crop.
