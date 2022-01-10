@@ -256,8 +256,8 @@ def get_args():
                         help="x resolution during evaluation (default: 128)")
     parser.add_argument("--eval_yres", type=int, default=128, metavar="Y",
                         help="y resolution during evaluation (default: 128)")
-    parser.add_argument("--eval_tres", type=int, default=200, metavar="T",
-                        help="t resolution during evaluation (default: 200)")
+    parser.add_argument("--eval_tres", type=int, default=192, metavar="T",
+                        help="t resolution during evaluation (default: 192)")
     parser.add_argument("--eval_downsamp_t", default=4, type=int, 
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--eval_downsamp_xy", default=8, type=int,
@@ -266,7 +266,7 @@ def get_args():
     parser.add_argument("--save_path", type=str, default='./eval/Exp1/eval1')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--eval_dataset", type=str, default='swe_exp1.npz')
+    parser.add_argument("--eval_dataset", type=str, default='swe.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
