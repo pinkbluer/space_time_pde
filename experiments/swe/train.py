@@ -330,9 +330,11 @@ def main():
                              sampler=eval_sampler, **kwargs)
 
     # setup model
-    unet = UNet3d(in_features=4, out_features=args.lat_dims, igres=trainset.scale_lres,
+    unet = UNet3d(in_features=3, out_features=args.lat_dims, igres=trainset.scale_lres,
                   nf=args.unet_nf, mf=args.unet_mf)
-    imnet = ImNet(dim=3, in_features=args.lat_dims, out_features=4, nf=args.imnet_nf, 
+    # imnet = ImNet(dim=3, in_features=args.lat_dims, out_features=4, nf=args.imnet_nf, 
+    #               activation=NONLINEARITIES[args.nonlin])
+    imnet = ImNet(dim=3, in_features=args.lat_dims, out_features=3, nf=args.imnet_nf, 
                   activation=NONLINEARITIES[args.nonlin])
     all_model_params = list(unet.parameters())+list(imnet.parameters())
 
