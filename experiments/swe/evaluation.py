@@ -266,7 +266,7 @@ def get_args():
     parser.add_argument("--save_path", type=str, default='./eval/Exp1/eval1')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--eval_dataset", type=str, default='swe.npz')
+    parser.add_argument("--eval_dataset", type=str, default='swe_exp1.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
