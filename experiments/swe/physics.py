@@ -64,7 +64,7 @@ def get_rb2_pde_layer(mean=None, std=None, t_crop=2., z_crop=1., x_crop=2., pran
     return pde_layer  # NOTE: forward method has not yet been updated.
 
 def get_swe_pde_layer(mean=None, std=None, t_crop=2., y_crop=1., x_crop=2., prandtl=1., rayleigh=1e6, use_continuity=False):
-    """Get PDE layer corresponding to the RB2 govening equations.
+    """Get PDE layer corresponding to the SWE govening equations.
 
     Args:
         mean: array of length 3 corresponding to the mean of the 3 physical channels, for normalizng

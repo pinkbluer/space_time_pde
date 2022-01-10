@@ -15,8 +15,8 @@ class RB2DataLoader(Dataset):
     Loads a 2d space + time cubic cutout from the whole simulation.
     """
     def __init__(self, data_dir="./data", data_filename="rb2d_ra1e6_s42.npz",
-                 nx=128, nz=128, nt=16, n_samp_pts_per_crop=1024,
-                 downsamp_xz=4, downsamp_t=4, normalize_output=False, normalize_hres=False,
+                 nx=128, ny=128, nt=16, n_samp_pts_per_crop=1024,
+                 downsamp_xy=4, downsamp_t=4, normalize_output=False, normalize_hres=False,
                  return_hres=False, lres_filter='none', lres_interp='linear'):
         """
 
@@ -25,10 +25,10 @@ class RB2DataLoader(Dataset):
           data_dir: str, path to the dataset folder, default="./data"
           data_filename: str, name of the dataset file, default="rb2d_ra1e6_s42.npz"
           nx: int, number of 'pixels' in x dimension for high res dataset.
-          nz: int, number of 'pixels' in z dimension for high res dataset.
+          ny: int, number of 'pixels' in y dimension for high res dataset.
           nt: int, number of timesteps in time for high res dataset.
           n_samp_pts_per_crop: int, number of sample points to return per crop.
-          downsamp_xz: int, downsampling factor for the spatial dimensions.
+          downsamp_xy: int, downsampling factor for the spatial dimensions.
           downsamp_t: int, downsampling factor for the temporal dimension.
           normalize_output: bool, whether to normalize the range of each channel to [0, 1].
           normalize_hres: bool, normalize high res grid.
@@ -41,13 +41,13 @@ class RB2DataLoader(Dataset):
         self.data_dir = data_dir
         self.data_filename = data_filename
         self.nx_hres = nx
-        self.nz_hres = nz
+        self.ny_hres = ny
         self.nt_hres = nt
-        self.nx_lres = int(nx/downsamp_xz)
-        self.nz_lres = int(nz/downsamp_xz)
+        self.nx_lres = int(nx/downsamp_xy)
+        self.ny_lres = int(ny/downsamp_xy)
         self.nt_lres = int(nt/downsamp_t)
         self.n_samp_pts_per_crop = n_samp_pts_per_crop
-        self.downsamp_xz = downsamp_xz
+        self.downsamp_xy = downsamp_xy
         self.downsamp_t = downsamp_t
         self.normalize_output = normalize_output
         self.normalize_hres = normalize_hres
@@ -65,26 +65,26 @@ class RB2DataLoader(Dataset):
         self.data = np.stack([npdata['p'], npdata['b'], npdata['u'], npdata['w']], axis=0)
         self.data = self.data.astype(np.float32)
         self.data = self.data.transpose(0, 1, 3, 2)  # [c, t, z, x]
-        nc_data, nt_data, nz_data, nx_data = self.data.shape
+        nc_data, nt_data, ny_data, nx_data = self.data.shape
 
-        # assert nx, nz, nt are viable
-        if (nx > nx_data) or (nz > nz_data) or (nt > nt_data):
+        # assert nx, ny, nt are viable
+        if (nx > nx_data) or (ny > ny_data) or (nt > nt_data):
             raise ValueError('Resolution in each spatial temporal dimension x ({}), z({}), t({})'
                              'must not exceed dataset limits x ({}) z ({}) t ({})'.format(
-                                 nx, nz, nt, nx_data, nz_data, nt_data))
-        if (nt % downsamp_t != 0) or (nx % downsamp_xz != 0) or (nz % downsamp_xz != 0):
-            raise ValueError('nx, nz and nt must be divisible by downsamp factor.')
+                                 nx, ny, nt, nx_data, ny_data, nt_data))
+        if (nt % downsamp_t != 0) or (nx % downsamp_xy != 0) or (ny % downsamp_xy != 0):
+            raise ValueError('nx, ny and nt must be divisible by downsamp factor.')
 
         self.nx_start_range = np.arange(0, nx_data-nx+1)
-        self.nz_start_range = np.arange(0, nz_data-nz+1)
+        self.ny_start_range = np.arange(0, ny_data-ny+1)
         self.nt_start_range = np.arange(0, nt_data-nt+1)
         self.rand_grid = np.stack(np.meshgrid(self.nt_start_range,
-                                              self.nz_start_range,
+                                              self.ny_start_range,
                                               self.nx_start_range, indexing='ij'), axis=-1)
         # (xaug, zaug, taug, 3)
         self.rand_start_id = self.rand_grid.reshape([-1, 3])
-        self.scale_hres = np.array([self.nt_hres, self.nz_hres, self.nx_hres], dtype=np.int32)
-        self.scale_lres = np.array([self.nt_lres, self.nz_lres, self.nx_lres], dtype=np.int32)
+        self.scale_hres = np.array([self.nt_hres, self.ny_hres, self.nx_hres], dtype=np.int32)
+        self.scale_lres = np.array([self.nt_lres, self.ny_lres, self.nx_lres], dtype=np.int32)
 
         # compute channel-wise mean and std
         self._mean = np.mean(self.data, axis=(1, 2, 3))
@@ -97,12 +97,12 @@ class RB2DataLoader(Dataset):
         """Filter a given signal with a choice of filter type (self.lres_filter).
         """
         signal = signal.copy()
-        filter_size = [1, self.downsamp_t*2-1, self.downsamp_xz*2-1, self.downsamp_xz*2-1]
+        filter_size = [1, self.downsamp_t*2-1, self.downsamp_xy*2-1, self.downsamp_xy*2-1]
 
         if self.lres_filter == 'none' or (not self.lres_filter):
             output = signal
         elif self.lres_filter == 'gaussian':
-            sigma = [0, int(self.downsamp_t/2), int(self.downsamp_xz/2), int(self.downsamp_xz/2)]
+            sigma = [0, int(self.downsamp_t/2), int(self.downsamp_xy/2), int(self.downsamp_xy/2)]
             output = ndimage.gaussian_filter(signal, sigma=sigma)
         elif self.lres_filter == 'uniform':
             output = ndimage.uniform_filter(signal, size=filter_size)
@@ -122,9 +122,9 @@ class RB2DataLoader(Dataset):
           idx: int, index of the crop to return. must be smaller than len(self).
 
         Returns:
-          space_time_crop_hres (*optional): array of shape [4, nt_hres, nz_hres, nx_hres],
+          space_time_crop_hres (*optional): array of shape [4, nt_hres, ny_hres, nx_hres],
           where 4 are the phys channels pbuw.
-          space_time_crop_lres: array of shape [4, nt_lres, nz_lres, nx_lres], where 4 are the phys
+          space_time_crop_lres: array of shape [4, nt_lres, ny_lres, nx_lres], where 4 are the phys
           channels pbuw.
           point_coord: array of shape [n_samp_pts_per_crop, 3], where 3 are the t, x, z dims.
                        CAUTION - point_coord are normalized to (0, 1) for the relative window.
@@ -133,7 +133,7 @@ class RB2DataLoader(Dataset):
         t_id, z_id, x_id = self.rand_start_id[idx]
         space_time_crop_hres = self.data[:,
                                          t_id:t_id+self.nt_hres,
-                                         z_id:z_id+self.nz_hres,
+                                         z_id:z_id+self.ny_hres,
                                          x_id:x_id+self.nx_hres]  # [c, t, z, x]
 
         # create low res grid from hi res space time crop
@@ -141,11 +141,11 @@ class RB2DataLoader(Dataset):
         space_time_crop_hres_fil = self.filter(space_time_crop_hres)
 
         interp = RegularGridInterpolator(
-            (np.arange(self.nt_hres), np.arange(self.nz_hres), np.arange(self.nx_hres)),
+            (np.arange(self.nt_hres), np.arange(self.ny_hres), np.arange(self.nx_hres)),
             values=space_time_crop_hres_fil.transpose(1, 2, 3, 0), method=self.lres_interp)
 
         lres_coord = np.stack(np.meshgrid(np.linspace(0, self.nt_hres-1, self.nt_lres),
-                                          np.linspace(0, self.nz_hres-1, self.nz_lres),
+                                          np.linspace(0, self.ny_hres-1, self.ny_lres),
                                           np.linspace(0, self.nx_hres-1, self.nx_lres),
                                           indexing='ij'), axis=-1)
         space_time_crop_lres = interp(lres_coord).transpose(3, 0, 1, 2)  # [c, t, z, x]
@@ -259,7 +259,7 @@ class RB2DataLoader(Dataset):
 
 if __name__ == '__main__':
     ### example for using the data loader
-    data_loader = RB2DataLoader(nt=16, n_samp_pts_per_crop=10000, downsamp_t=4, downsamp_xz=8, return_hres=True)
+    data_loader = RB2DataLoader(nt=16, n_samp_pts_per_crop=10000, downsamp_t=4, downsamp_xy=8, return_hres=True)
     # lres_crop, point_coord, point_value = data_loader[61234]
     # import matplotlib.pyplot as plt
     # plt.scatter(point_coord[:, 1], point_coord[:, 2], c=point_value[:, 0])

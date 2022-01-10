@@ -36,7 +36,7 @@ use_continuity=True
 log_dir_name="./log/Exp1"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 def loss_functional(loss_type):
     """Get loss function given function type names."""
@@ -119,7 +119,7 @@ def eval(args, unet, imnet, eval_loader, epoch, global_step, device,
     """Eval function. Used for evaluating entire slices and comparing to GT."""
     unet.eval()
     imnet.eval()
-    phys_channels = ["p", "b", "u", "w"]
+    phys_channels = ["eta", "u", "v"]
     phys2id = dict(zip(phys_channels, range(len(phys_channels))))
     xmin = torch.zeros(3, dtype=torch.float32).to(device)
     xmax = torch.ones(3, dtype=torch.float32).to(device)
@@ -129,11 +129,11 @@ def eval(args, unet, imnet, eval_loader, epoch, global_step, device,
     # send tensors to device
     data_tensors = [t.to(device) for t in data_tensors]
     hres_grid, lres_grid, _, _ = data_tensors
-    latent_grid = unet(lres_grid)  # [batch, C, T, Z, X]
-    nb, nc, nt, nz, nx = hres_grid.shape
+    latent_grid = unet(lres_grid)  # [batch, C, T, Y, X]
+    nb, nc, nt, ny, nx = hres_grid.shape
 
     # permute such that C is the last channel for local implicit grid query
-    latent_grid = latent_grid.permute(0, 2, 3, 4, 1)  # [batch, T, Z, X, C]
+    latent_grid = latent_grid.permute(0, 2, 3, 4, 1)  # [batch, T, Y, X, C]
 
     # define lambda function for pde_layer
     fwd_fn = lambda points: query_local_implicit_grid(imnet, latent_grid, points, xmin, xmax)
@@ -144,11 +144,11 @@ def eval(args, unet, imnet, eval_loader, epoch, global_step, device,
     # layout query points for the desired slices
     eps = 1e-6
     t_seq = torch.linspace(eps, 1-eps, nt)[::int(nt/8)]  # temporal sequences
-    z_seq = torch.linspace(eps, 1-eps, nz)  # z sequences
+    y_seq = torch.linspace(eps, 1-eps, ny)  # y sequences
     x_seq = torch.linspace(eps, 1-eps, nx)  # x sequences
 
-    query_coord = torch.stack(torch.meshgrid(t_seq, z_seq, x_seq), axis=-1)  # [nt, nz, nx, 3]
-    query_coord = query_coord.reshape([-1, 3]).to(device)  # [nt*nz*nx, 3]
+    query_coord = torch.stack(torch.meshgrid(t_seq, y_seq, x_seq), axis=-1)  # [nt, ny, nx, 3]
+    query_coord = query_coord.reshape([-1, 3]).to(device)  # [nt*ny*nx, 3]
     n_query = query_coord.shape[0]
 
     res_dict = defaultdict(list)
@@ -172,21 +172,21 @@ def eval(args, unet, imnet, eval_loader, epoch, global_step, device,
 
     for key in res_dict.keys():
         res_dict[key] = (torch.cat(res_dict[key], axis=1)
-                         .reshape([nb, len(t_seq), len(z_seq), len(x_seq)]))
+                         .reshape([nb, len(t_seq), len(y_seq), len(x_seq)]))
 
     # log the imgs sample-by-sample
     for samp_id in range(nb):
         for key in res_dict.keys():
-            field = res_dict[key][samp_id]  # [nt, nz, nx]
+            field = res_dict[key][samp_id]  # [nt, ny, nx]
             # add predicted slices
-            images = utils.batch_colorize_scalar_tensors(field)  # [nt, nz, nx, 3]
+            images = utils.batch_colorize_scalar_tensors(field)  # [nt, ny, nx, 3]
 
             writer.add_images('sample_{}/{}/predicted'.format(samp_id, key), images,
                 dataformats='NHWC', global_step=int(global_step))
             # add ground truth slices (only for phys channels)
             if key in phys_channels:
-                gt_fields = hres_grid[samp_id, phys2id[key], ::int(nt/8)]  # [nt, nz, nx]
-                gt_images = utils.batch_colorize_scalar_tensors(gt_fields)  # [nt, nz, nx, 3]
+                gt_fields = hres_grid[samp_id, phys2id[key], ::int(nt/8)]  # [nt, ny, nx]
+                gt_images = utils.batch_colorize_scalar_tensors(gt_fields)  # [nt, ny, nx, 3]
 
                 writer.add_images('sample_{}/{}/ground_truth'.format(samp_id, key), gt_images,
                     dataformats='NHWC', global_step=int(global_step))
@@ -231,10 +231,10 @@ def get_args():
                         help="path to checkpoint if resume is needed")
     parser.add_argument("--nt", default=16, type=int, help="resolution of high res crop in t.")
     parser.add_argument("--nx", default=128, type=int, help="resolution of high res crop in x.")
-    parser.add_argument("--nz", default=128, type=int, help="resolution of high res crop in z.")
+    parser.add_argument("--ny", default=128, type=int, help="resolution of high res crop in z.")
     parser.add_argument("--downsamp_t", default=4, type=int,
                         help="down sampling factor in t for low resolution crop.")
-    parser.add_argument("--downsamp_xz", default=8, type=int,
+    parser.add_argument("--downsamp_xy", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
     parser.add_argument("--n_samp_pts_per_crop", default=512, type=int,
                         help="number of sample points to draw per crop.")
@@ -308,15 +308,15 @@ def main():
     # create dataloaders
     trainset = loader.RB2DataLoader(
         data_dir=args.data_folder, data_filename=args.train_data,
-        nx=args.nx, nz=args.nz, nt=args.nt, n_samp_pts_per_crop=args.n_samp_pts_per_crop,
-        downsamp_xz=args.downsamp_xz, downsamp_t=args.downsamp_t,
+        nx=args.nx, ny=args.ny, nt=args.nt, n_samp_pts_per_crop=args.n_samp_pts_per_crop,
+        downsamp_xy=args.downsamp_xy, downsamp_t=args.downsamp_t,
         normalize_output=args.normalize_channels, return_hres=False,
         lres_filter=args.lres_filter, lres_interp=args.lres_interp
     )
     evalset = loader.RB2DataLoader(
         data_dir=args.data_folder, data_filename=args.eval_data,
-        nx=args.nx, nz=args.nz, nt=args.nt, n_samp_pts_per_crop=args.n_samp_pts_per_crop,
-        downsamp_xz=args.downsamp_xz, downsamp_t=args.downsamp_t,
+        nx=args.nx, ny=args.ny, nt=args.nt, n_samp_pts_per_crop=args.n_samp_pts_per_crop,
+        downsamp_xy=args.downsamp_xy, downsamp_t=args.downsamp_t,
         normalize_output=args.normalize_channels, return_hres=True,
         lres_filter=args.lres_filter, lres_interp=args.lres_interp
     )
@@ -378,7 +378,7 @@ def main():
     else:
         mean = std = None
     pde_layer = get_swe_pde_layer(mean=mean, std=std,
-        t_crop=args.nt*0.125, z_crop=args.nz*(1./128), x_crop=args.nx*(1./128), prandtl=args.prandtl, rayleigh=args.rayleigh,
+        t_crop=args.nt*0.125, y_crop=args.ny*(1./128), x_crop=args.nx*(1./128), prandtl=args.prandtl, rayleigh=args.rayleigh,
         use_continuity=args.use_continuity)
 
     if args.lr_scheduler:

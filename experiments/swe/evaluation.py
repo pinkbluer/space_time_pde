@@ -20,34 +20,34 @@ from pde import PDELayer
 from nonlinearities import NONLINEARITIES
 from local_implicit_grid import query_local_implicit_grid
 import dataloader_spacetime as loader
-from physics import get_rb2_pde_layer
+from physics import get_swe_pde_layer
 from torch_flow_stats import *
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
-def evaluate_feat_grid(pde_layer, latent_grid, t_seq, z_seq, x_seq, mins, maxs, pseudo_batch_size):
+def evaluate_feat_grid(pde_layer, latent_grid, t_seq, y_seq, x_seq, mins, maxs, pseudo_batch_size):
     """Evaluate latent feature grid at fixed intervals.
 
     Args:
         pde_layer: PDELayer instance where fwd_fn has been defined.
-        latent_grid: latent feature grid of shape [batch, T, Z, X, C]
+        latent_grid: latent feature grid of shape [batch, T, Y, X, C]
         t_seq: flat torch array of t-coordinates to evaluate
-        z_seq: flat torch array of z-coordinates to evaluate
+        y_seq: flat torch array of y-coordinates to evaluate
         x_seq: flat torch array of x-coordinates to evaluate
-        mins: flat torch array of len 3 for min coords of t, z, x
-        maxs: flat torch array of len 3 for max coords of t, z, x
+        mins: flat torch array of len 3 for min coords of t, y, x
+        maxs: flat torch array of len 3 for max coords of t, y, x
         pseudo_batch_size, int, size of pseudo batch during eval
     Returns:
         res_dict: result dict.
     """
     device = latent_grid.device
     nb = latent_grid.shape[0]
-    phys_channels = ["p", "b", "u", "w"]
+    phys_channels = ["eta", "u", "v"]
     phys2id = dict(zip(phys_channels, range(len(phys_channels))))
 
-    query_coord = torch.stack(torch.meshgrid(t_seq, z_seq, x_seq), axis=-1)  # [nt, nz, nx, 3]
+    query_coord = torch.stack(torch.meshgrid(t_seq, y_seq, x_seq), axis=-1)  # [nt, ny, nx, 3]
 
-    nt, nz, nx, _ = query_coord.shape
+    nt, ny, nx, _ = query_coord.shape
     query_coord = query_coord.reshape([-1, 3]).to(device)
     n_query  = query_coord.shape[0]
 
@@ -72,7 +72,7 @@ def evaluate_feat_grid(pde_layer, latent_grid, t_seq, z_seq, x_seq, mins, maxs, 
 
     for key in res_dict.keys():
         res_dict[key] = (np.concatenate(res_dict[key], axis=1)
-                         .reshape([nb, len(t_seq), len(z_seq), len(x_seq)]))[0]
+                         .reshape([nb, len(t_seq), len(y_seq), len(x_seq)]))[0]
     return res_dict
 
 
@@ -200,11 +200,11 @@ def model_inference(args, lres, pde_layer):
     # construct model
     print(f"Loading model parameters from {args.ckpt}...")
     igres = (int(args.nt/args.downsamp_t),
-             int(args.nz/args.downsamp_xz),
-             int(args.nx/args.downsamp_xz),)
-    unet = UNet3d(in_features=4, out_features=args.lat_dims, igres=igres,
+             int(args.ny/args.downsamp_xy),
+             int(args.nx/args.downsamp_xy),)
+    unet = UNet3d(in_features=3, out_features=args.lat_dims, igres=igres,
                   nf=args.unet_nf, mf=args.unet_mf)
-    imnet = ImNet(dim=3, in_features=args.lat_dims, out_features=4, nf=args.imnet_nf,
+    imnet = ImNet(dim=3, in_features=args.lat_dims, out_features=3, nf=args.imnet_nf,
                   activation=NONLINEARITIES[args.nonlin])
 
     # load model params
@@ -220,21 +220,21 @@ def model_inference(args, lres, pde_layer):
 
     # evaluate
     latent_grid = unet(torch.tensor(lres, dtype=torch.float32)[None].to(device))
-    latent_grid = latent_grid.permute(0, 2, 3, 4, 1)  # [batch, T, Z, X, C]
+    latent_grid = latent_grid.permute(0, 2, 3, 4, 1)  # [batch, T, Y, X, C]
 
     # create evaluation grid
     t_max = float(args.eval_tres/args.nt)
-    z_max = 1
-    x_max = 4
+    y_max = 1
+    x_max = 1
 
     # layout query points for the desired slices
     eps = 1e-6
     t_seq = torch.linspace(eps, t_max-eps, args.eval_tres)  # temporal sequences
-    z_seq = torch.linspace(eps, z_max-eps, args.eval_zres)  # z sequences
+    y_seq = torch.linspace(eps, y_max-eps, args.eval_yres)  # y sequences
     x_seq = torch.linspace(eps, x_max-eps, args.eval_xres)  # x sequences
 
     mins = torch.zeros(3, dtype=torch.float32, device=device)
-    maxs = torch.tensor([t_max, z_max, x_max], dtype=torch.float32, device=device)
+    maxs = torch.tensor([t_max, y_max, x_max], dtype=torch.float32, device=device)
 
     # define lambda function for pde_layer
     fwd_fn = lambda points: query_local_implicit_grid(imnet, latent_grid, points, mins, maxs)
@@ -242,7 +242,7 @@ def model_inference(args, lres, pde_layer):
     # update pde layer and compute predicted values + pde residues
     pde_layer.update_forward_method(fwd_fn)
 
-    res_dict = evaluate_feat_grid(pde_layer, latent_grid, t_seq, z_seq, x_seq, mins, maxs,
+    res_dict = evaluate_feat_grid(pde_layer, latent_grid, t_seq, y_seq, x_seq, mins, maxs,
                                   args.eval_pseudo_batch_size)
 
     return res_dict
@@ -252,21 +252,21 @@ def model_inference(args, lres, pde_layer):
 def get_args():
     # Training settings
     parser = argparse.ArgumentParser(description="Segmentation")
-    parser.add_argument("--eval_xres", type=int, default=512, metavar="X",
-                        help="x resolution during evaluation (default: 512)")
-    parser.add_argument("--eval_zres", type=int, default=128, metavar="Z",
-                        help="z resolution during evaluation (default: 128)")
-    parser.add_argument("--eval_tres", type=int, default=192, metavar="T",
-                        help="t resolution during evaluation (default: 192)")
+    parser.add_argument("--eval_xres", type=int, default=128, metavar="X",
+                        help="x resolution during evaluation (default: 128)")
+    parser.add_argument("--eval_yres", type=int, default=128, metavar="Y",
+                        help="y resolution during evaluation (default: 128)")
+    parser.add_argument("--eval_tres", type=int, default=200, metavar="T",
+                        help="t resolution during evaluation (default: 200)")
     parser.add_argument("--eval_downsamp_t", default=4, type=int, 
                         help="down sampling factor in t for low resolution crop.")
-    parser.add_argument("--eval_downsamp_xz", default=8, type=int,
-                        help="down sampling factor in x and z for low resolution crop.")
+    parser.add_argument("--eval_downsamp_xy", default=8, type=int,
+                        help="down sampling factor in x and y for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp3/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/Exp3/rb2d_ra1e6_s102')
+    parser.add_argument("--save_path", type=str, default='./eval/Exp1/swe')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--eval_dataset", type=str, default='rb2d_ra1e6_s102.npz')
+    parser.add_argument("--eval_dataset", type=str, default='swe.npz')
     parser.add_argument("--lres_interp", type=str, default='linear',
                         help="str, interpolation scheme for generating low res. choices of 'linear', 'nearest'")
     parser.add_argument("--lres_filter", type=str, default='none',
@@ -300,21 +300,20 @@ def main():
     # prepare dataset
     dataset = loader.RB2DataLoader(
         data_dir=args.data_folder, data_filename=args.eval_dataset,
-        nx=args.eval_xres, nz=args.eval_zres, nt=args.eval_tres, n_samp_pts_per_crop=1,
-        lres_interp=args.lres_interp, lres_filter=args.lres_filter, downsamp_xz=args.eval_downsamp_xz, downsamp_t=args.eval_downsamp_t,
+        nx=args.eval_xres, ny=args.eval_yres, nt=args.eval_tres, n_samp_pts_per_crop=1,
+        lres_interp=args.lres_interp, lres_filter=args.lres_filter, downsamp_xy=args.eval_downsamp_xy, downsamp_t=args.eval_downsamp_t,
         normalize_output=args.normalize_channels, return_hres=True)
 
     # extract data
     hres, lres, _, _ = dataset[0]
 
-    # get pdelayer for the RB2 equations
+    # get pdelayer for the swe equations
     if args.normalize_channels:
         mean = dataset.channel_mean
         std = dataset.channel_std
     else:
         mean = std = None
-    pde_layer = get_rb2_pde_layer(mean=mean, std=std, prandtl=args.prandtl, rayleigh=args.rayleigh)
-    # pde_layer = get_rb2_pde_layer(mean=mean, std=std)
+    pde_layer = get_swe_pde_layer(mean=mean, std=std, prandtl=args.prandtl, rayleigh=args.rayleigh)
 
     # evaluate model for getting high res spatial temporal sequence
     res_dict = model_inference(args, lres, pde_layer)
