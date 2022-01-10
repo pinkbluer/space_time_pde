@@ -25,7 +25,7 @@ def save_checkpoint(state, is_best, epoch, output_folder, filename, logger):
         os.remove(output_folder + filename + '_%03d' % (epoch-1) + '.pth.tar')
     torch.save(state, output_folder + filename + '_%03d' % epoch + '.pth.tar')
     if is_best:
-        logger.info("Saving new best model! Loss Sum: {:.6f}", state["tracked_stats"])
+        logger.info("Saving new best model! Loss Sum: %.6f", state["tracked_stats"])
         shutil.copyfile(output_folder + filename + '_%03d' % epoch + '.pth.tar',
                         output_folder + filename + '_best.pth.tar')
 
