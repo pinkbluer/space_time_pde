@@ -33,7 +33,7 @@ rayleigh=1000000
 prandtl=1
 gamma=0.0125
 use_continuity=True
-log_dir_name="./log/Exp1"
+log_dir_name="./log/Exp2"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['CUDA_VISIBLE_DEVICES'] = '1,3,4,5,6,7'
@@ -205,7 +205,7 @@ def get_args():
 
     # Training settings
     parser = argparse.ArgumentParser(description="Segmentation")
-    parser.add_argument("--batch_size_per_gpu", type=int, default=10, metavar="N",
+    parser.add_argument("--batch_size_per_gpu", type=int, default=20, metavar="N",
                         help="input batch size for training (default: 10)")
     parser.add_argument("--epochs", type=int, default=100, metavar="N",
                         help="number of epochs to train (default: 100)")
@@ -219,10 +219,10 @@ def get_args():
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--train_data", type=str, default="swe.npz",
-                        help="name of training data (default: swe.npz)")
-    parser.add_argument("--eval_data", type=str, default="swe.npz",
-                        help="name of training data (default: swe.npz)")
+    parser.add_argument("--train_data", type=str, default="swe_exp2.npz",
+                        help="name of training data (default: swe_exp2.npz)")
+    parser.add_argument("--eval_data", type=str, default="swe_exp2.npz",
+                        help="name of training data (default: swe_exp2.npz)")
     parser.add_argument("--log_interval", type=int, default=10, metavar="N",
                         help="how many batches to wait before logging training status")
     parser.add_argument("--log_dir", type=str,  default=log_dir_name, help="log directory for run")
