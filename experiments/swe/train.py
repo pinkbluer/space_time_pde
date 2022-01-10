@@ -31,9 +31,10 @@ from physics import get_swe_pde_layer
 # Rayleigh and Prandtl numbers - set according to your dataset
 rayleigh=1000000
 prandtl=1
-gamma=0.0125
+# gamma=0.0125
+gamma=1
 use_continuity=True
-log_dir_name="./log/Exp2"
+log_dir_name="./log/Exp1_2"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['CUDA_VISIBLE_DEVICES'] = '1,3,4,5,6,7'
@@ -219,10 +220,10 @@ def get_args():
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--train_data", type=str, default="swe_exp2.npz",
-                        help="name of training data (default: swe_exp2.npz)")
-    parser.add_argument("--eval_data", type=str, default="swe_exp2.npz",
-                        help="name of training data (default: swe_exp2.npz)")
+    parser.add_argument("--train_data", type=str, default="swe_exp1.npz",
+                        help="name of training data (default: swe_exp1.npz)")
+    parser.add_argument("--eval_data", type=str, default="swe_exp1.npz",
+                        help="name of training data (default: swe_exp1.npz)")
     parser.add_argument("--log_interval", type=int, default=10, metavar="N",
                         help="how many batches to wait before logging training status")
     parser.add_argument("--log_dir", type=str,  default=log_dir_name, help="log directory for run")
