@@ -60,11 +60,11 @@ class RB2DataLoader(Dataset):
             warnings.warn("the median filter is very slow...", RuntimeWarning)
 
         # concatenating pressure, temperature, x-velocity, and z-velocity as a 4 channel array: pbuw
-        # shape: (4, 200, 512, 128)
+        # shape: (3, 200, 128, 128)
         npdata = np.load(os.path.join(self.data_dir, self.data_filename))
-        self.data = np.stack([npdata['p'], npdata['b'], npdata['u'], npdata['w']], axis=0)
+        self.data = np.stack([npdata['eta'], npdata['u'], npdata['v']], axis=0)
         self.data = self.data.astype(np.float32)
-        self.data = self.data.transpose(0, 1, 3, 2)  # [c, t, z, x]
+        self.data = self.data.transpose(0, 1, 3, 2)  # [c, t, y, x]
         nc_data, nt_data, ny_data, nx_data = self.data.shape
 
         # assert nx, ny, nt are viable
@@ -130,11 +130,11 @@ class RB2DataLoader(Dataset):
                        CAUTION - point_coord are normalized to (0, 1) for the relative window.
           point_value: array of shape [n_samp_pts_per_crop, 4], where 4 are the phys channels pbuw.
         """
-        t_id, z_id, x_id = self.rand_start_id[idx]
+        t_id, y_id, x_id = self.rand_start_id[idx]
         space_time_crop_hres = self.data[:,
                                          t_id:t_id+self.nt_hres,
-                                         z_id:z_id+self.ny_hres,
-                                         x_id:x_id+self.nx_hres]  # [c, t, z, x]
+                                         y_id:y_id+self.ny_hres,
+                                         x_id:x_id+self.nx_hres]  # [c, t, y, x]
 
         # create low res grid from hi res space time crop
         # apply filter
@@ -231,7 +231,7 @@ class RB2DataLoader(Dataset):
         """Denormalize grid.
 
         Args:
-          grid: np array or torch tensor of shape [4, ...], 4 are the num. of phys channels.
+          grid: np array or torch tensor of shape [3, ...], 3 are the num. of phys channels.
         Returns:
           channel denormalized grid of same shape as input.
         """
@@ -246,7 +246,7 @@ class RB2DataLoader(Dataset):
         """Denormalize points.
 
         Args:
-          points: np array or torch tensor of shape [..., 4], 4 are the num. of phys channels.
+          points: np array or torch tensor of shape [..., 3], 3 are the num. of phys channels.
         Returns:
           channel denormalized points of same shape as input.
         """
