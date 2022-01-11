@@ -31,10 +31,20 @@ from physics import get_swe_pde_layer
 # Rayleigh and Prandtl numbers - set according to your dataset
 rayleigh=1000000
 prandtl=1
+
 # gamma=0.0125
-gamma=0
+# log_dir_name="./log/Exp1"
+
+# gamma=0.1
+# log_dir_name="./log/Exp1_2"
+
+# gamma=0
+# log_dir_name="./log/Exp1_3"
+
+gamma=0.05
+log_dir_name="./log/Exp1_4"
+
 use_continuity=False
-log_dir_name="./log/Exp1_3"
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
 os.environ['CUDA_VISIBLE_DEVICES'] = '1,3,4,5,6,7'
