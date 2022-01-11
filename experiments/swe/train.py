@@ -218,7 +218,7 @@ def get_args():
     parser = argparse.ArgumentParser(description="Segmentation")
     parser.add_argument("--batch_size_per_gpu", type=int, default=20, metavar="N",
                         help="input batch size for training (default: 10)")
-    parser.add_argument("--epochs", type=int, default=100, metavar="N",
+    parser.add_argument("--epochs", type=int, default=500, metavar="N",
                         help="number of epochs to train (default: 100)")
     parser.add_argument("--pseudo_epoch_size", type=int, default=3000, metavar="N",
                         help="number of samples in an pseudo-epoch. (default: 3000)")
