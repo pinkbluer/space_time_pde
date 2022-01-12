@@ -180,7 +180,7 @@ def export_video(args, res_dict, hres, lres, dataset):
             # axes[2].set_title(f'{name} channel, predicted values.')
             # im2.set_clim(min_val, max_val)
 
-            fig, axes = plt.subplots(1,3, figsize=(10, 5))#, 1, sharex=True)
+            fig, axes = plt.subplots(1,3, figsize=(12, 6))#, 1, sharex=True)
             # high res ground truth
             im0 = axes[0].imshow(hres_frames[hid], cmap='RdBu',interpolation='spline16')
             axes[0].set_title(f'{name} channel, high res ground truth.')
