@@ -38,11 +38,11 @@ prandtl=1
 # gamma=0.1
 # log_dir_name="./log/Exp1_2"
 
-# gamma=0
-# log_dir_name="./log/Exp1_3"
+gamma=0
+log_dir_name="./log/Exp2_3"
 
-gamma=0.05
-log_dir_name="./log/Exp1_4"
+# gamma=0.05
+# log_dir_name="./log/Exp1_4"
 
 use_continuity=False
 
@@ -230,9 +230,9 @@ def get_args():
                         help="random seed (default: 1)")
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
-    parser.add_argument("--train_data", type=str, default="swe_exp1.npz",
+    parser.add_argument("--train_data", type=str, default="swe_exp2_train.npz",
                         help="name of training data (default: swe_exp1.npz)")
-    parser.add_argument("--eval_data", type=str, default="swe_exp1.npz",
+    parser.add_argument("--eval_data", type=str, default="swe_exp2_train.npz",
                         help="name of training data (default: swe_exp1.npz)")
     parser.add_argument("--log_interval", type=int, default=10, metavar="N",
                         help="how many batches to wait before logging training status")
