@@ -115,8 +115,8 @@ def train(args, unet, imnet, train_loader, epoch, global_step, device,
 
         global_step += 1
     
-    print('Total number of trained batch in this epoch: %d\n' % count)
-    print('Total loss of this epoch: %.6f\n' % tot_loss)
+    print('Total number of trained batch in this epoch: %d' % count)
+    print('Total loss of this epoch: %.6f' % tot_loss)
 
     tot_loss /= count
     return tot_loss
