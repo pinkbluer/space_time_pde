@@ -13,7 +13,7 @@ import shutil
 import os
 # import our modules
 import sys
-sys.path.append("../../../src")
+sys.path.append("../../src")
 from unet3d import UNet3d
 from implicit_net import ImNet
 from pde import PDELayer
@@ -271,14 +271,14 @@ def get_args():
                         help="x resolution during evaluation (default: 128)")
     parser.add_argument("--eval_yres", type=int, default=128, metavar="Y",
                         help="y resolution during evaluation (default: 128)")
-    parser.add_argument("--eval_tres", type=int, default=200, metavar="T",
+    parser.add_argument("--eval_tres", type=int, default=192, metavar="T",
                         help="t resolution during evaluation (default: 192)")
-    parser.add_argument("--eval_downsamp_t", default=10, type=int, 
+    parser.add_argument("--eval_downsamp_t", default=4, type=int, 
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--eval_downsamp_xy", default=8, type=int,
                         help="down sampling factor in x and y for low resolution crop.")
     parser.add_argument('--ckpt', type=str, default='./log/Exp1/checkpoint_latest.pth.tar_pdenet_best.pth.tar', help="path to checkpoint")
-    parser.add_argument("--save_path", type=str, default='./eval/exp2_eval2')
+    parser.add_argument("--save_path", type=str, default='./eval/Exp1/exp2_eval2')
     parser.add_argument("--data_folder", type=str, default="./data",
                         help="path to data folder (default: ./data)")
     parser.add_argument("--eval_dataset", type=str, default='swe_exp2_eval2.npz')

@@ -1,4 +1,6 @@
-"""Training script for RB2 experiment.
+"""Training script for swe experiment 1_3_1.
+    gamma=0
+    use_continuity=False
 """
 import argparse
 import json
@@ -17,7 +19,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 # import our modules
 import sys
-sys.path.append("../../src")
+sys.path.append("../../../src")
 import train_utils as utils
 from unet3d import UNet3d
 from implicit_net import ImNet
@@ -32,17 +34,8 @@ from physics import get_swe_pde_layer
 rayleigh=1000000
 prandtl=1
 
-# gamma=0.0125
-# log_dir_name="./log/Exp1"
-
-# gamma=0.1
-# log_dir_name="./log/Exp1_2"
-
 gamma=0
-log_dir_name="./log/Exp1_3"
-
-# gamma=0.05
-# log_dir_name="./log/Exp1_4"
+log_dir_name="./log"
 
 use_continuity=False
 
@@ -122,6 +115,8 @@ def train(args, unet, imnet, train_loader, epoch, global_step, device,
 
         global_step += 1
     tot_loss /= count
+    print('Total number of trained batch in this epoch: %d\n' % count)
+    print('Total loss of this epoch: %.6f\n' % tot_loss)
     return tot_loss
 
 
@@ -234,16 +229,16 @@ def get_args():
                         help="name of training data (default: swe_exp1_train.npz)")
     parser.add_argument("--eval_data", type=str, default="swe_exp1_train.npz",
                         help="name of training data (default: swe_exp1_train.npz)")
-    parser.add_argument("--log_interval", type=int, default=10, metavar="N",
+    parser.add_argument("--log_interval", type=int, default=1, metavar="N",
                         help="how many batches to wait before logging training status")
     parser.add_argument("--log_dir", type=str,  default=log_dir_name, help="log directory for run")
     parser.add_argument("--optim", type=str, default="adam", choices=["adam", "sgd"])
     parser.add_argument("--resume", type=str, default=None,
                         help="path to checkpoint if resume is needed")
-    parser.add_argument("--nt", default=16, type=int, help="resolution of high res crop in t.")
+    parser.add_argument("--nt", default=40, type=int, help="resolution of high res crop in t.")
     parser.add_argument("--nx", default=128, type=int, help="resolution of high res crop in x.")
     parser.add_argument("--ny", default=128, type=int, help="resolution of high res crop in z.")
-    parser.add_argument("--downsamp_t", default=4, type=int,
+    parser.add_argument("--downsamp_t", default=10, type=int,
                         help="down sampling factor in t for low resolution crop.")
     parser.add_argument("--downsamp_xy", default=8, type=int,
                         help="down sampling factor in x and z for low resolution crop.")
