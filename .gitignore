@@ -131,4 +131,5 @@ experiments/rb2d/eval/
 experiments/rb2d/log/
 experiments/swe/exp1_3_1/
 experiments/swe/log/
+experiments/swe/eval/
 simulation/2d_rayleigh_benard/data/
