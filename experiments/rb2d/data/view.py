@@ -1,3 +1,5 @@
+#数据文件大小不同，因为数据精度不同，s42为float64，s132和s102为float32
+
 import numpy as np
 
 # filename = 'experiments/rb2d/data/rb2d_ra1e6_s42.npz'
